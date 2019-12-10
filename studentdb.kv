@@ -1,0 +1,66 @@
+#:kivy 2.0.0
+
+StudentDB:
+
+<SelectableLabel>:
+    # Draw a background to indicate selection
+    canvas.before:
+        Color:
+            rgba: (1, 0, 0, 1) if self.selected else (.0, 0.9, .1, .3)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: (0, 0.9, .1, .3)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+<StudentDB>:
+	orientation: "vertical"
+	first_name_text_input: first_name
+	last_name_text_input: last_name
+	student_list: students_list_view
+	padding: 10
+	spacing: 10
+
+	BoxLayout:
+		size_hint_y: None
+		height: "40dp"
+
+		Label:
+			text: "First name"
+		TextInput:
+			id: first_name
+		Label:
+			text: "Last name"
+		TextInput:
+			id: last_name
+
+	BoxLayout:
+		size_hint_y: None
+		height: "40dp"
+		Button:
+			text: "Submit"
+			size_hint_x: 15
+			on_press: root.submit_student()
+		Button:
+			text: "Delete"
+			size_hint_x: 15
+			on_press: root.delete_student()
+		Button:
+			text: "Replace"
+			size_hint_x: 15
+			on_press: root.replace_student()
+		
+	RecycleView:
+		id: students_list_view
+		viewclass: 'SelectableLabel'
+		SelectableRecycleBoxLayout:
+			default_size: None, dp(26)
+            default_size_hint: 1, None
+            size_hint_y: None
+            height: self.minimum_height
+            orientation: 'vertical'
+            multiselect: True
+            touch_multiselect: True
