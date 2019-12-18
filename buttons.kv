@@ -54,23 +54,26 @@ Root1:
 
 	RV:
 	#	top: root.top - suka.height
+
+
 <Test>:
 	orientation: "horizontal"
-
 	MyButton:
-		size_hint_x: .5
-		text: "ff"
-	MyButton:
-		pos_hint_x: .5
-		size_hint_x: .5
-		text: "f2"
+		text: root.text
+# MyButton:
+	#    	size_hint_x: .5
+	#	text: "ff"
+#	MyButton:
+	#	pos_hint_x: .5
+	#	size_hint_x: .5
+	#	text: "f2"
 
 <MyButton>:
 	#size: '30sp', '30sp'
 	#pos_hint: { 'right': 0.5 }
 	#size_hint: 0.3, 0.2 
     on_release:
-        root.print_data(self.input_data)
+    	root.print_data(self.input_data)
 
 # <buttonsApp>:
 # 	FloatLayout:

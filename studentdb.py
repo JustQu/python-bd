@@ -49,6 +49,8 @@ class StudentDB(BoxLayout):
 
     def submit_student(self):
         self.student_list.data = [{'text': str(self.first_name_text_input).join(str(self.last_name_text_input))}]
+        self.student_list.data = [{'text': str(self.first_name_text_input).join(str(self.last_name_text_input))}]
+        self.student_list.data = [{'text': str(self.first_name_text_input).join(str(self.last_name_text_input))}]
 
     def delete_student(self):
         pass

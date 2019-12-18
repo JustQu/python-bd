@@ -25,6 +25,8 @@ items = [
     {"color":(1, 1, 1, 1), "font_size": "50sp", "text": "s",         "input_data": ["some","2","data"]}
 ]
 
+#shit
+
 class Test(RecycleDataViewBehavior, BoxLayout):
     def print_data(self,data):
         print(data)

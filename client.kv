@@ -1,0 +1,130 @@
+#:kivy 1.10.0
+
+<MyScreenManager>:
+	name: 'screen_manager2'
+	id: 'screen_manager'
+	RootWidget:
+	GamePage:
+
+<GamePage>:
+	name: 'game_page'
+	Label:
+    	id: 'first_screen_label'
+        text: "Game page.\n Currently in dev"
+	Button:
+		size_hint: .1, .1
+		text: 'back'
+		on_press: root.parent.go_to_main_page('main_page')
+
+<GameRow>:
+	canvas.before:
+        Color:
+            rgba: (0.5, 0.5, 0.5, 1)
+           # rgba: (.0, 0.9, .1, .3) if self.selected else (0.5, 0.5, 0.5, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+	game_name: ''
+	game_genre: ''
+	year: ''
+	Label:
+		text: root.game_name
+		on_touch_down:  pass
+	Label:
+		text: root.game_genre
+		on_touch_down: pass
+	Label:
+		text: root.year
+		on_touch_down: pass
+
+
+<RV>:
+	pepega: pepega
+	id: rv
+	viewclass: 'GameRow'
+	SelectableRecycleBoxLayout:
+		id: pepega
+		default_size: None, dp(56)
+		default_size_hint: 1, None
+		size_hint_y: None
+		height: self.minimum_height
+		orientation: 'vertical'
+		spacing: dp(2)
+		multiselect: False
+        touch_multiselect: False
+
+
+<RootWidget>:
+	name: 'main_page'
+	orientation: 'vertical'
+
+	canvas.before:
+		Color:
+			rgba: .6, .2, .3, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+
+	MenuBar:
+		#size: self.size
+		#pos: self.pos
+		#size_hint_y: None
+		#pos_hint: { 'top': .6}
+		#size_hint: 1, .1
+		size_hint_y: None
+		height: 50
+		#pos_hint: {'y': 1}
+	
+	SearchEngine:
+		size: self.size
+		size_hint: 1, .1
+
+	RV:
+
+
+<MenuBar>:
+	#pos: self.pos
+	login: loginInput
+	password: passwdInput
+
+	canvas.before:
+		Color:
+			rgba: 0.22, 0.40, 0.69, 1
+		Rectangle:
+			size: self.size
+
+	TextInput:
+		id: loginInput
+		multiline: False
+		pos_hint: {'x': .45, 'center_y': .5}
+		size_hint: .2, .6
+		write_tab: False
+		hint_text: 'login'
+
+	TextInput:
+		id: passwdInput
+		multiline: False
+		password: True
+		hint_text: 'password'
+		write_tab: False
+		pos_hint: {'x': .65, 'center_y': .5}
+		size_hint: .2, .6
+
+	Button:
+		text: "войти"
+		size_hint: .1, .6
+		pos_hint: {'x': .87, 'center_y': .5}
+		on_press: root.log_in(loginInput.text, passwdInput.text)
+
+
+<SearchEngine>:
+	canvas.before:
+		Color:
+			rgba: 0.22, 0.40, 0.69, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	Label:
+		text: "search"
+		size_hint: None, .1
+		pos_hint: { 'x': .25, 'y': .5}
