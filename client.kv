@@ -5,6 +5,12 @@
 	id: 'screen_manager'
 	RootWidget:
 	GamePage:
+	NewGamePage:
+
+<NewGamePage>:
+	name: 'new_game_page'
+	Button:
+		on_press: root.parent.go_to_main_page()
 
 <GamePage>:
 	name: 'game_page'
@@ -14,7 +20,7 @@
 	Button:
 		size_hint: .1, .1
 		text: 'back'
-		on_press: root.parent.go_to_main_page('main_page')
+		on_press: root.parent.go_to_main_page()
 
 <GameRow>:
 	canvas.before:
@@ -79,8 +85,21 @@
 		size: self.size
 		size_hint: 1, .1
 
+	AdminPanel:
+		size_hint_y: None
+		height: 40 if app.admin else 0
 	RV:
 
+<AdminPanel>:
+	canvas.before:
+		Color:
+			rgba: 1, 0.40, 0.69, 1
+		Rectangle:
+			size: self.size
+
+	Button:
+		size_hint_x: 0.5
+		on_press: root.parent.parent.go_to_new_game_page()
 
 <MenuBar>:
 	#pos: self.pos

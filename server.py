@@ -72,28 +72,31 @@ def read_request(client_sock, delimeter=b''):
     #     raise
 
 
-def log_in(args):
+def log_in(**kwargs):
     response = {}
-    cursor.execute(f'''
+    cursor.execute('''
         SELECT `users`.`id`
-        ,      `users`.`login` as login
-        ,      `user_passwd`.`user_passwd` as password
-        ,      `user_passwd`.`auth_tok` as token
+        ,      `users`.`login` as `login`
+        ,      `users`.`group` as `group`
+        ,      `user_passwd`.`user_passwd` as `password`
+        ,      `user_passwd`.`auth_tok` as `token`
             FROM `users` INNER JOIN `user_passwd`
                 ON `users`.`id` = `user_passwd`.`user_id`
-                 WHERE `users`.`login` = '{args['login']}';
-        ''')
+                 WHERE `users`.`login` = %(login)s;
+        ''', {'login': kwargs['login']
+        })
     record = cursor.fetchall()
 
     response['status'] = 'fail'
 
     if record != ():
         record = record[0]
-        if 'auth_token' in args:
-            if args['auth_token'] == record[3]:
+        if 'auth_token' in kwargs:
+            if kwargs['auth_token'] == record[4]:
                 response['status'] = 'success'
-        elif record[2] == args['password']:
+        elif record[3] == kwargs['password']:
             response['auth_token'] = str(uuid4())
+            response['group'] = record[2]
             response['status'] = 'success'
             cursor.execute(f'''
                 UPDATE `user_passwd`
@@ -104,13 +107,86 @@ def log_in(args):
     return response
 
 
+def register():
+    pass
+
+
+#insert information about game into sql
+def add_game(**kwargs):
+    
+    cursor.execute('''
+        INSERT IGNORE INTO `developers`(`developer_name`)
+            VALUES
+            %(developer)s
+    ''', {'developer': kwargs['developer']
+    })
+
+    cursor.execute('''
+        INSERT IGNORE INTO `games`(`game_name`, `release_date`, `rating`, `description`)
+            SELECT %(name)s
+            ,%(release)s
+            ,%(rating)s
+            ,%(description)s
+    ''', {'name': kwargs['game_name'],
+          'realease': kwargs['release_date'],
+          'rating': kwargs['rating'],
+          'description': kwargs['description']
+    })
+    
+    for publisher in kwargs['publishers']:
+        cursor.execute('''
+            INSERT IGNORE INTO `publishers`(`publisher_name`)
+                VALUES
+                %(publisher)s
+        ''', {'publisher': publisher})
+
+        cursor.execute('''
+            INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
+            SELECT `game_id`, `publisher_id` FROM `games`, `publishers`
+            WHERE `game_name` = %(name)s
+            AND `publisher_name` = %(publisher)s;  
+        ''', {'name': kwargs['game_name'],
+              'publisher': publisher})
+
+    cursor.execute('''
+        INSERT INTO `game_developer`(`game_id`, `developer_id`)
+        SELECT `game_id`, `developer_id` FROM `games`, `developers`
+        WHERE `game_name` = %(name)s
+        AND `developer_name` = %(developer)s
+    ''', {'name': kwargs['game_name'],
+          'developer': kwargs['developer']})
+
+    for platform in kwargs['platforms']:
+        cursor.execute('''
+            INSERT INTO `game_platform`(`game_id`, `platform_id`)
+            SELECT `game_id`, `platform_id` FROM `games`, `platforms`
+            WHERE `game_name` = %(name)s
+            AND `platform_name` = %(platform)s
+        ''', {'name': kwargs['game_name'],
+              'platform': platform})
+
+    # for image in kwargs['images']:
+    #     cursor.execute('''
+    #         INSERT INTO `pictures`(`game_id`, `source`)
+    #     ''')
+    ...
+
+
+def get_games_list():
+    pass
+
+
+def get_game_info():
+    pass
+
+
 Exec_request = {
     "login": log_in
 }
 
 
 def handle_request(request):
-    response = Exec_request.get(request['type'], lambda: 'Invalid')(request)
+    response = Exec_request.get(request['type'], lambda: 'Invalid')(**request)
     #Exec_request[request['type']](request)
    #time.sleep(5)
     return response

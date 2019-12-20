@@ -14,7 +14,6 @@ CREATE TABLE `user_passwd` (
 CREATE TABLE `games` (
   `game_id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `game_name` VARCHAR(255) NOT NULL,
-  `developer_id` INT NOT NULL,
   `release_date` DATE,
   `rating` FLOAT NOT NULL,
   `description` TEXT
@@ -27,17 +26,17 @@ CREATE TABLE `genres` (
 
 CREATE TABLE `developers` (
   `developer_id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `developer_name` VARCHAR(255) NOT NULL
+  `developer_name` VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE `publishers` (
   `publisher_id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `publisher_name` VARCHAR(255) NOT NULL
+  `publisher_name` VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE `platforms` (
   `platform_id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `platform_name` VARCHAR(255)
+  `platform_name` VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE `rewiews` (
@@ -55,6 +54,11 @@ CREATE TABLE `game_platform` (
 CREATE TABLE `game_genre` (
   `game_id` INT NOT NULL,
   `genre_id` INT
+);
+
+CREATE TABLE `game_developer` (
+  `game_id` INT,
+  `developer_id` INT
 );
 
 CREATE TABLE `game_publisher` (
@@ -79,15 +83,17 @@ ALTER TABLE `game_publisher` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`ga
 
 ALTER TABLE `game_publisher` ADD FOREIGN KEY (`publisher_id`) REFERENCES `publishers` (`publisher_id`);
 
-ALTER TABLE `games` ADD FOREIGN KEY (`developer_id`) REFERENCES `developers` (`developer_id`);
-
 ALTER TABLE `game_genre` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
 
 ALTER TABLE `game_genre` ADD FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`);
 
 ALTER TABLE `pictures` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
 
-ALTER TABLE `user_passwd` ADD FOREIGN KEY (`iser_id`) REFERENCES `users` (`id`);
+ALTER TABLE `user_passwd` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+ALTER TABLE `game_developer` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+
+ALTER TABLE `game_developer` ADD FOREIGN KEY (`developer_id`) REFERENCES `developers` (`developer_id`);
 
 INSERT INTO `users` (`login`, `group`)
 	VALUES
@@ -124,17 +130,26 @@ INSERT INTO `developers` (`developer_name`)
 	('CD Projekt Red Studio'),
 	('Ubisoft');
 
-INSERT INTO `games` (`game_name`
-					,`developer_id`
-					,`release_date`
-					,`rating`
-					,`description`)
+INSERT INTO `publishers`(`publisher_name`)
+	VALUES
+	('Bandai Namco Games'),
+	('Warner Bros. Interactive Entertainment'),
+	('CD Projekt');
+
+INSERT INTO `games` (`game_name`, `release_date`, `rating`, `description`)
 	SELECT 'The Witcher 3'
-			,developer_id
-			,'2015-05-19'
-			,'10'
-			,'12/10 best'
+	,'2015-05-19'
+	,'10'
+	,'12/10 best'
 	FROM `developers`
 	WHERE developer_name = 'CD Projekt Red Studio';
 	
+
+INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
+	SELECT `game_id`, `publisher_id`
+	FROM `games`, `publishers`
+	WHERE `game_name` = 'The Witcher 3'
+	AND `publisher_name` = 'CD Projekt'; 
+
+select games.*, publishers.publisher_name from games join game_publisher using(game_id) inner join publishers using(publisher_id);
 		

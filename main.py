@@ -141,18 +141,24 @@ class MenuBar(RelativeLayout):
         request['type'] = 'login'
         request['login'] = login
         request['password'] = password
+
         tcp_socket = socket(AF_INET, SOCK_STREAM)
         tcp_socket.connect(addr)
         sc.send_msg(tcp_socket, request)
         response = sc.recv_msg(tcp_socket)
         tcp_socket.close()
         response = pickle.loads(response)
+
         if response != {}:
             if response['status'] == 'success':
-                #hide
+                client.loged_in = True
                 self.loged_in = True
                 self.size_hint_y = None
                 self.height = 0
+                if response['group'] == 'admin':
+                    client.admin = True
+                else:
+                    client.admin = False
 
 
 class GamePage(Screen):
@@ -205,6 +211,14 @@ class GameRow(RecycleDataViewBehavior, BoxLayout):
             print("selection removed for {0}".format(rv.data[index]))
 
 
+class AdminPanel(BoxLayout):
+    pass
+
+
+class NewGamePage(BoxLayout, Screen):
+    pass
+
+
 #list of games
 class RV(RecycleView):
     pepega = ObjectProperty(None)
@@ -226,17 +240,20 @@ class MyScreenManager(ScreenManager):
     def __init__(self, **kwargs):
         super(MyScreenManager, self).__init__(**kwargs)
 
-    def go_to_game_page(self, name):
-        print(name)
+    def go_to_game_page(self):
         self.current = 'game_page'
 
-    def go_to_main_page(self, name):
+    def go_to_main_page(self):
         self.current = 'main_page'
+
+    def go_to_new_game_page(self):
+        self.current = 'new_game_page'
 
 
 class clientApp(App):
 
     loged_in = BooleanProperty(False)
+    admin = BooleanProperty(False)
 
     def __init__(self, **kwargs):
         super(clientApp, self).__init__(**kwargs)
@@ -256,7 +273,9 @@ class clientApp(App):
 
 
 client = clientApp()
+
 client.run()
+
 
 # #our main class
 # class client():
