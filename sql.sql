@@ -79,7 +79,7 @@ ALTER TABLE `game_platform` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`gam
 
 ALTER TABLE `game_platform` ADD FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`platform_id`);
 
-ALTER TABLE `game_publisher` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `game_publisher` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
 ALTER TABLE `game_publisher` ADD FOREIGN KEY (`publisher_id`) REFERENCES `publishers` (`publisher_id`);
 
@@ -91,7 +91,7 @@ ALTER TABLE `pictures` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`
 
 ALTER TABLE `user_passwd` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
-ALTER TABLE `game_developer` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `game_developer` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
 ALTER TABLE `game_developer` ADD FOREIGN KEY (`developer_id`) REFERENCES `developers` (`developer_id`);
 
@@ -152,4 +152,8 @@ INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
 	AND `publisher_name` = 'CD Projekt'; 
 
 select games.*, publishers.publisher_name from games join game_publisher using(game_id) inner join publishers using(publisher_id);
-		
+select genre_name from genres join game_genre using(genre_id) join games using(game_id) where game_name = 'Nier: Automata'
+
+--select genres.genre_name, publishers.publisher_name, developers.developer_name from games join game_genre using(game_id) inn
+--er join genres using(genre_id) join game_publisher using(game_id) inner join publishers using(publisher_id) join game_developer using(game_id
+--) inner join developers using (developer_id);

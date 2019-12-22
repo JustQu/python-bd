@@ -123,10 +123,10 @@ def add_game(**kwargs):
 
     cursor.execute('''
         INSERT IGNORE INTO `games`(`game_name`, `release_date`, `rating`, `description`)
-            SELECT %(name)s
-            ,%(release)s
-            ,%(rating)s
-            ,%(description)s
+            SELECT '%(name)s'
+            ,'%(release)s'
+            ,'%(rating)s'
+            ,'%(description)s'
     ''', {'name': kwargs['game_name'],
           'realease': kwargs['release_date'],
           'rating': kwargs['rating'],
@@ -136,8 +136,8 @@ def add_game(**kwargs):
     for publisher in kwargs['publishers']:
         cursor.execute('''
             INSERT IGNORE INTO `publishers`(`publisher_name`)
-                VALUES
-                %(publisher)s
+                SELECT
+                '%(publisher)s'
         ''', {'publisher': publisher})
 
         cursor.execute('''

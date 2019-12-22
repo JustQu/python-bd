@@ -126,13 +126,22 @@ data = [
     }
 ]
 
+def get_response(request):
+    tcp_socket = socket(AF_INET, SOCK_STREAM)
+    tcp_socket.connect(addr)
+    sc.send_msg(tcp_socket, request)
+    response = sc.recv_msg(tcp_socket)
+    tcp_socket.close()
+    response = pickle.loads(response)
+    print(response)
+    return response
 
 class SearchEngine(BoxLayout):
     pass
 
 
-class MenuBar(RelativeLayout):
-    logged_in = BooleanProperty(False)
+class MenuBar(BoxLayout):
+    loged_in = BooleanProperty(False)
     login = ObjectProperty(None)
     password = ObjectProperty(None)
 
@@ -142,30 +151,41 @@ class MenuBar(RelativeLayout):
         request['login'] = login
         request['password'] = password
 
-        tcp_socket = socket(AF_INET, SOCK_STREAM)
-        tcp_socket.connect(addr)
-        sc.send_msg(tcp_socket, request)
-        response = sc.recv_msg(tcp_socket)
-        tcp_socket.close()
-        response = pickle.loads(response)
+        response = get_response(request)
 
         if response != {}:
             if response['status'] == 'success':
                 client.loged_in = True
                 self.loged_in = True
-                self.size_hint_y = None
-                self.height = 0
+                client.user_login = login
+                #self.size_hint_y = None
+                #self.height = 0
                 if response['group'] == 'admin':
                     client.admin = True
                 else:
                     client.admin = False
+    
+    def register(self, login, password, password2):
+        if password != password2:
+            return None
+
+#Отображение имя пользователя и кнопки выхода
+class UserField(RelativeLayout):
+    pass
+
+#форма входа
+class LoginField(RelativeLayout):
+    pass
+
+#форма регистрации
+class RegisterField(RelativeLayout):
+    pass
 
 
 class GamePage(Screen):
     
     def __init__(self, **kwargs):
         super(GamePage, self).__init__(**kwargs)
-        print("Print it now")
 
 
 class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
@@ -195,23 +215,20 @@ class GameRow(RecycleDataViewBehavior, BoxLayout):
             return True
         if self.collide_point(*touch.pos) and self.selectable:
             print('Selected: {}'.format(self.index))
-            #print(self.parent.f)
             return self.parent.select_with_touch(self.index, touch)
 
     def apply_selection(self, rv, index, is_selected):
         ''' Respond to the selection of items in the view. '''
-        #self.selected = is_selected
         if is_selected:
-            # print(self.__dict__)
             #don't know how make it more elegant
-            rv.parent.parent.go_to_game_page(self.game_name)
+            rv.parent.parent.go_to_game_page()
             rv.pepega.clear_selection()
             print("selection changed to {0}".format(rv.data[index]))
         else:
             print("selection removed for {0}".format(rv.data[index]))
 
 
-class AdminPanel(BoxLayout):
+class AdminPanel(RelativeLayout):
     pass
 
 
@@ -255,44 +272,18 @@ class clientApp(App):
     loged_in = BooleanProperty(False)
     admin = BooleanProperty(False)
 
+    user_login = StringProperty('')
+
     def __init__(self, **kwargs):
         super(clientApp, self).__init__(**kwargs)
-        self.host = 'localhost'
-        self.port = 8000
-        self.addr = (self.host, self.port)
-        self.tcp_socket = socket(AF_INET, SOCK_STREAM)
 
     def build(self):
         self.sm = MyScreenManager()
         return self.sm
-        #return Image(source='output-onlinepngtools.png')
 
     def load_game_page(self, name, selected):
         if selected:
-            self.sm.go_to_game_page(name)
-
+            self.sm.go_to_game_page()
 
 client = clientApp()
-
 client.run()
-
-
-# #our main class
-# class client():
-
-#     app = clientApp()
-
-#     def __init__(self, **kwargs):
-#         self.app = clientApp()
-#         self.
-
-#     def connect(self):
-#         pass
-
-#     #run application
-#     def run(self):
-#         self.app.run()
-
-# userClient = client()
-# userClient.connect()
-# userClient.run()

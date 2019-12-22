@@ -9,8 +9,114 @@
 
 <NewGamePage>:
 	name: 'new_game_page'
-	Button:
-		on_press: root.parent.go_to_main_page()
+	orientation: 'vertical'
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': .7}
+			text: 'Название игры:'
+		TextInput:
+			id: game_name
+			multiline: False
+			write_tab: False
+
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Жанры:'
+		TextInput:
+			id: game_name
+			multiline: False
+			write_tab: False
+
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Разработчик:'
+		TextInput:
+			id: game_name
+			multiline: False
+			write_tab: False
+
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Издатели:'
+		TextInput:
+			id: game_name
+			multiline: False
+			write_tab: False
+
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Платформы:'
+		TextInput:
+			id: game_name
+			multiline: False
+			write_tab: False
+		
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Оценка:'
+		Slider:
+			id: grade
+			min:0
+			max: 1000
+			step: 1
+			orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: '%.2f / 10' % (grade.value / 100.00)
+
+	BoxLayout:
+		size_hint: 1, .3
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Описание:'
+		TextInput:
+			id: game_name
+			multiline: True
+			write_tab: False
+	RelativeLayout:
+		size_hint: 1, .1
+		Button:
+			size_hint_x: .10
+			text: "Назад"
+			on_press: root.parent.go_to_main_page()
+		Button:
+			text: 'добавить игру'
+			size_hint_x: .15
+			pos_hint: {'x': .84}
 
 <GamePage>:
 	name: 'game_page'
@@ -43,7 +149,6 @@
 		text: root.year
 		on_touch_down: pass
 
-
 <RV>:
 	pepega: pepega
 	id: rv
@@ -59,59 +164,64 @@
 		multiselect: False
         touch_multiselect: False
 
-
 <RootWidget>:
 	name: 'main_page'
 	orientation: 'vertical'
-
 	canvas.before:
 		Color:
 			rgba: .6, .2, .3, 1
 		Rectangle:
 			pos: self.pos
 			size: self.size
-
 	MenuBar:
-		#size: self.size
-		#pos: self.pos
-		#size_hint_y: None
-		#pos_hint: { 'top': .6}
-		#size_hint: 1, .1
-		size_hint_y: None
-		height: 50
-		#pos_hint: {'y': 1}
-	
+		size_hint_y: .4
 	SearchEngine:
 		size: self.size
 		size_hint: 1, .1
-
 	AdminPanel:
 		size_hint_y: None
-		height: 40 if app.admin else 0
+		height: 40 if not app.admin else 40
+		Button:
+			pos_hint: {'x': 2, 'y': 2} if app.admin else {'x': 0.88, 'y': 0}
+			size_hint_x: None
+			text: 'add game'
+			on_press: root.parent.go_to_new_game_page()
 	RV:
 
 <AdminPanel>:
 	canvas.before:
 		Color:
-			rgba: 1, 0.40, 0.69, 1
+			rgba: .6, .2, .3, 1
 		Rectangle:
 			size: self.size
 
-	Button:
-		size_hint_x: 0.5
-		on_press: root.parent.parent.go_to_new_game_page()
-
-<MenuBar>:
-	#pos: self.pos
-	login: loginInput
-	password: passwdInput
-
+<UserField>:
 	canvas.before:
 		Color:
 			rgba: 0.22, 0.40, 0.69, 1
 		Rectangle:
 			size: self.size
+	Label:
+		pos_hint: {'x': .1, 'y': .5}
+		text: app.user_login
+	Button:
+		size_hint_x: .15
+		pos_hint: {'x': 0.85}
+		text: 'Выйти'
 
+<LoginField>:
+	login: loginInput
+	password: passwdInput
+	canvas.before:
+		Color:
+			rgba: 0.22, 0.40, 0.69, 1
+		Rectangle:
+			size: self.size
+	Button:
+		size_hint: None, .6
+		width: 160
+		text: 'Регистрация'
+		#size: self.texture_size
 	TextInput:
 		id: loginInput
 		multiline: False
@@ -119,7 +229,6 @@
 		size_hint: .2, .6
 		write_tab: False
 		hint_text: 'login'
-
 	TextInput:
 		id: passwdInput
 		multiline: False
@@ -128,12 +237,59 @@
 		write_tab: False
 		pos_hint: {'x': .65, 'center_y': .5}
 		size_hint: .2, .6
-
 	Button:
 		text: "войти"
 		size_hint: .1, .6
 		pos_hint: {'x': .87, 'center_y': .5}
-		on_press: root.log_in(loginInput.text, passwdInput.text)
+		on_press: root.parent.log_in(loginInput.text, passwdInput.text)
+
+<RegisterField>:
+	canvas.before:
+		Color:
+			rgba: 0.22, 0.40, 0.69, 1
+		Rectangle:
+			size: self.size
+	TextInput:
+		id: loginInput
+		multiline: False
+		pos_hint: {'x': .17, 'center_y': .5}
+		size_hint: .2, .6
+		write_tab: False
+		hint_text: 'login'
+	TextInput:
+		id: passwdInput
+		multiline: False
+		password: True
+		hint_text: 'password'
+		write_tab: False
+		pos_hint: {'x': .38, 'center_y': .5}
+		size_hint: .2, .6
+	TextInput:
+		id: passwdInput2
+		multiline: False
+		password: True
+		hint_text: 'submit password'
+		write_tab: False
+		pos_hint: {'x': .59, 'center_y': .5}
+		size_hint: .2, .6
+	Button:
+		text: "Зарегистрироваться"
+		pos_hint: {'x': .80, 'center_y': .5}
+		size_hint_y: .6
+		size_hint_x: None
+		width: 150
+		on_press: root.parent.register(loginInput.text, passwdInput.text, passwdInput2.text)
+
+
+<MenuBar>:
+	#pos: self.pos
+	orientation: 'vertical'
+
+	UserField:
+	#	size_hint_y: 0.3
+	LoginField:
+	#	size_hint_y: 0.3
+	RegisterField:
 
 
 <SearchEngine>:
