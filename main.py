@@ -136,6 +136,7 @@ def get_response(request):
     print(response)
     return response
 
+
 class SearchEngine(BoxLayout):
     pass
 
@@ -144,6 +145,10 @@ class MenuBar(BoxLayout):
     loged_in = BooleanProperty(False)
     login = ObjectProperty(None)
     password = ObjectProperty(None)
+
+    user_field = ObjectProperty(None)
+    login_field = ObjectProperty(None)
+    register_field = ObjectProperty(None)
 
     def log_in(self, login, password):
         request = {}
@@ -169,21 +174,38 @@ class MenuBar(BoxLayout):
         if password != password2:
             return None
 
+
 #Отображение имя пользователя и кнопки выхода
 class UserField(RelativeLayout):
-    pass
+
+    def hide(self):
+        pass
+
+    def show(self):
+        pass
+
 
 #форма входа
 class LoginField(RelativeLayout):
-    pass
+    
+    def hide(self):
+        pass
+
+    def show(self):
+        pass
+
 
 #форма регистрации
 class RegisterField(RelativeLayout):
-    pass
+
+    def hide(self):
+        pass
+
+    def show(self):
+        pass
 
 
 class GamePage(Screen):
-    
     def __init__(self, **kwargs):
         super(GamePage, self).__init__(**kwargs)
 
@@ -284,6 +306,7 @@ class clientApp(App):
     def load_game_page(self, name, selected):
         if selected:
             self.sm.go_to_game_page()
+
 
 client = clientApp()
 client.run()

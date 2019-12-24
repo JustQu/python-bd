@@ -118,6 +118,7 @@
 			size_hint_x: .15
 			pos_hint: {'x': .84}
 
+
 <GamePage>:
 	name: 'game_page'
 	Label:
@@ -221,6 +222,7 @@
 		size_hint: None, .6
 		width: 160
 		text: 'Регистрация'
+		#on_press: root.parent.
 		#size: self.texture_size
 	TextInput:
 		id: loginInput
@@ -284,12 +286,18 @@
 <MenuBar>:
 	#pos: self.pos
 	orientation: 'vertical'
+	user_field: user_field
+	login_field: login_field
+	register_field: register_field
 
 	UserField:
+		id: user_field
 	#	size_hint_y: 0.3
 	LoginField:
+		id: login_field
 	#	size_hint_y: 0.3
 	RegisterField:
+		id: register_field
 
 
 <SearchEngine>:

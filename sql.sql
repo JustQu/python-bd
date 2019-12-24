@@ -1,7 +1,7 @@
 CREATE TABLE `users` (
   `id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
   `login` VARCHAR(20) UNIQUE NOT NULL,
-  `group` ENUM ('admin', 'editor', 'user') NOT NULL,
+  `group` ENUM ('admin', 'editor', 'user') NOT NULL DEFAULT('user'),
   `created_at` TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP)
 );
 
@@ -13,7 +13,7 @@ CREATE TABLE `user_passwd` (
 
 CREATE TABLE `games` (
   `game_id` INT UNIQUE PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `game_name` VARCHAR(255) NOT NULL,
+  `game_name` VARCHAR(255) NOT NULL UNIQUE,
   `release_date` DATE,
   `rating` FLOAT NOT NULL,
   `description` TEXT
@@ -71,11 +71,11 @@ CREATE TABLE `pictures` (
   `source` blob
 );
 
-ALTER TABLE `rewiews` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+ALTER TABLE `rewiews` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
-ALTER TABLE `rewiews` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `rewiews` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
-ALTER TABLE `game_platform` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `game_platform` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
 ALTER TABLE `game_platform` ADD FOREIGN KEY (`platform_id`) REFERENCES `platforms` (`platform_id`);
 
@@ -83,11 +83,11 @@ ALTER TABLE `game_publisher` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`ga
 
 ALTER TABLE `game_publisher` ADD FOREIGN KEY (`publisher_id`) REFERENCES `publishers` (`publisher_id`);
 
-ALTER TABLE `game_genre` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `game_genre` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
 ALTER TABLE `game_genre` ADD FOREIGN KEY (`genre_id`) REFERENCES `genres` (`genre_id`);
 
-ALTER TABLE `pictures` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`);
+ALTER TABLE `pictures` ADD FOREIGN KEY (`game_id`) REFERENCES `games` (`game_id`) ON DELETE CASCADE;
 
 ALTER TABLE `user_passwd` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
@@ -123,33 +123,35 @@ INSERT INTO `platforms` (`platform_name`)
 	VALUES
 	('PC'),
 	('PS4'),
-	('XBOX one');
+	('XBOX one'),
+	('PS3'),
+	('XBOX 360');
 
-INSERT INTO `developers` (`developer_name`)
-	VALUES
-	('CD Projekt Red Studio'),
-	('Ubisoft');
+-- INSERT INTO `developers` (`developer_name`)
+-- 	VALUES
+-- 	('CD Projekt Red Studio'),
+-- 	('Ubisoft');
 
-INSERT INTO `publishers`(`publisher_name`)
-	VALUES
-	('Bandai Namco Games'),
-	('Warner Bros. Interactive Entertainment'),
-	('CD Projekt');
+-- INSERT INTO `publishers`(`publisher_name`)
+-- 	VALUES
+-- 	('Bandai Namco Games'),
+-- 	('Warner Bros. Interactive Entertainment'),
+-- 	('CD Projekt');
 
-INSERT INTO `games` (`game_name`, `release_date`, `rating`, `description`)
-	SELECT 'The Witcher 3'
-	,'2015-05-19'
-	,'10'
-	,'12/10 best'
-	FROM `developers`
-	WHERE developer_name = 'CD Projekt Red Studio';
+-- INSERT INTO `games` (`game_name`, `release_date`, `rating`, `description`)
+-- 	SELECT 'The Witcher 3'
+-- 	,'2015-05-19'
+-- 	,'10'
+-- 	,'12/10 best'
+-- 	FROM `developers`
+-- 	WHERE developer_name = 'CD Projekt Red Studio';
 	
 
-INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
-	SELECT `game_id`, `publisher_id`
-	FROM `games`, `publishers`
-	WHERE `game_name` = 'The Witcher 3'
-	AND `publisher_name` = 'CD Projekt'; 
+-- INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
+-- 	SELECT `game_id`, `publisher_id`
+-- 	FROM `games`, `publishers`
+-- 	WHERE `game_name` = 'The Witcher 3'
+-- 	AND `publisher_name` = 'CD Projekt'; 
 
 select games.*, publishers.publisher_name from games join game_publisher using(game_id) inner join publishers using(publisher_id);
 select genre_name from genres join game_genre using(genre_id) join games using(game_id) where game_name = 'Nier: Automata'
@@ -157,3 +159,10 @@ select genre_name from genres join game_genre using(genre_id) join games using(g
 --select genres.genre_name, publishers.publisher_name, developers.developer_name from games join game_genre using(game_id) inn
 --er join genres using(genre_id) join game_publisher using(game_id) inner join publishers using(publisher_id) join game_developer using(game_id
 --) inner join developers using (developer_id);
+
+select DISTINCT game_name, release_date, rating
+from games
+join game_genre using(game_id) join genres using(genre_id)
+join game_platform using(game_id) join platforms using(platform_id)
+join game_publisher using(game_id) join publishers using(publisher_id)
+join game_developer using(game_id) join developers using(developer_id);
