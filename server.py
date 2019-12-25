@@ -332,7 +332,10 @@ def get_game_info(**kwargs):
     ''' % {'game_id': game_id}
     cursor.execute(query1)
     game_info = cursor.fetchall()
-    response['game_name'] = game_info['game_name']
+    response['game_name'] = game_info[0][0]
+    response['release_date'] = game_info[0][1]
+    response['game_score'] = game_info[0][2]
+    response['description'] = game_info[0][3]
     #response['game_info'] = cursor.fetchall()
 
     #get_genres

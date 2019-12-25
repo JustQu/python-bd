@@ -320,9 +320,12 @@ class clientApp(App):
         response = get_response(request)
         print(response)
         if response['status'] == 'success':
-            self.game_name = response['game_info'][0][0]
+            self.game_name = response['game_name']
+            genres = []
+            for genre in response['genres']:
+                genres.append(genre[0])
+            self.genres = ', '.join(genres)
         self.sm.go_to_game_page()
-
 
 
 client = clientApp()
