@@ -93,7 +93,7 @@ def log_in(**kwargs):
     response['status'] = 'fail'
 
     print(kwargs['password'])
-    print(whirlpool.new(str.encode(kwargs['password'])))
+    print(whirlpool.new(str.encode(kwargs['password'])).hexdigest())
     if record != ():
         print(record)
         record = record[0]
@@ -117,6 +117,7 @@ def register(**kwargs):
     response = {}
     response['status'] ='fail'
 
+    #проверка корректности введенных данных
     if 'login' not in kwargs or 'password' not in kwargs:
         return response
     if len(kwargs['login']) < 2 or len(kwargs['login']) > 20 or len(kwargs['password']) < 6:
@@ -133,6 +134,7 @@ def register(**kwargs):
         print('Логин: ', kwargs['login'])
         if e.args[0] == error['Duplicate_entry']:
             print("Пользователь с таким именем уже существует.")
+            response['message'] = 'Пользователь с таким именем уже существует.'
         else:
             print(str(e))
         return response
@@ -152,9 +154,10 @@ def register(**kwargs):
         WHERE `login` = '%(login)s'
         ''' % {'login': kwargs['login']})
         mariadb_connection.commit()
-        print('Ошибка в добавлении при добавлении пароля нового пользователя')
+        print('Ошибка при добавлении пароля нового пользователя')
         print('Логин: ', kwargs['login'])
         print(str(e))
+        response['message'] = 'Ошибка при добавлении пароля нового пользователя'
         return response
     
     mariadb_connection.commit()
@@ -214,7 +217,7 @@ def add_game(**kwargs):
         INSERT INTO `game_developer`(`game_id`, `developer_id`)
         SELECT `game_id`, `developer_id` FROM `games`, `developers`
         WHERE `game_name` = '%(name)s'
-        AND `developer_name` = '%(developer)s';
+        AN#D `developer_name` = '%(developer)s';
     ''' % {'name': kwargs['game_name'],
           'developer': kwargs['developer']})
 
@@ -235,10 +238,25 @@ def add_game(**kwargs):
     ...
 
 
+#поиск игр в базе данных по критериям 
 def search(**kwargs):
+    '''поиск игр в базе данных по критериям.
+    Parameters:
+        **kwargs: аргументы по ключу используются в качестве критериев.
+    Возможно следующие ключи:
+        `game_name`
+        `genre_name`
+        `developer_name`
+        `year`
+        `paltforn_name`
+    Retruns:
+        dict: словарь с ключом `status`. Если `status` = 'success'
+            то список игр с ключом `game_list`
+    '''
     #default game_list
+    response = {}
     query = '''
-        SELECT DISTINCT `game_name`, `release_date`, `rating`
+        SELECT DISTINCT `game_id`, `game_name`, YEAR(`release_date`), `rating`
         FROM `games`
         JOIN `game_genre` USING(`game_id`) JOIN `genres` USING(`genre_id`)
         JOIN `game_platform` USING(`game_id`) JOIN `platforms` USING(`platform_id`)
@@ -246,7 +264,8 @@ def search(**kwargs):
         JOIN `game_developer` USING(`game_id`) JOIN `developers` USING(`developer_id`)
     '''
     if 'game_name' in  kwargs:
-        query += '''WHERE game_name LIKE '%%%(game_name)s%%' ''' % {'game_name': kwargs['game_name']}
+        query += '''WHERE game_name LIKE '%%%(game_name)s%%'
+        ''' % {'game_name': kwargs['game_name']}
     else:
         query += '''WHERE game_name LIKE '%%%%' '''
 
@@ -274,7 +293,9 @@ def search(**kwargs):
     result = cursor.fetchall()
     #for row in result:
     #   print(row)
-    return result
+    response['status'] = 'success'
+    response['game_list'] = result
+    return response
 
 def change_password(login, password, new_password):
     response = {}
@@ -300,16 +321,48 @@ def change_password(login, password, new_password):
     pass
 
 
-def get_game_info():
-
+def get_game_info(**kwargs):
+    response = {}
+    game_id = kwargs['game_id']
     #get game_name release_date rating description
     query1 = '''
-        INSERT
-    '''
+        SELECT game_name, release_date, rating, description
+        FROM games
+        WHERE game_id = '%(game_id)d'
+    ''' % {'game_id': game_id}
+    cursor.execute(query1)
+    game_info = cursor.fetchall()
+    response['game_name'] = game_info['game_name']
+    #response['game_info'] = cursor.fetchall()
+
     #get_genres
+    cursor.execute('''
+        SELECT genre_name
+        FROM genres
+        JOIN game_genre using(genre_id)
+        WHERE game_id = %(game_id)d
+    ''' % {'game_id': game_id})
+    response['genres'] = cursor.fetchall()
+
     #get_developer
+    cursor.execute('''
+        SELECT developer_name
+        FROM developers
+        JOIN game_developer USING(developer_id)
+        WHERE game_id = '%(game_id)d'
+    ''' % {'game_id': game_id})
+    response['developer'] = cursor.fetchall()
+
     #get_publisher
-    pass
+    cursor.execute('''
+        SELECT publisher_name
+        FROM publishers
+        JOIN game_publisher USING(publisher_id)
+        WHERE game_id = '%(game_id)d'
+    ''' % {'game_id': game_id})
+    response['publishers'] = cursor.fetchall()
+    response['status'] = 'success'
+    return response
 
 
 Exec_request = {
@@ -336,7 +389,8 @@ def write_response(client_sock, response, cid):
 
 
 if __name__ == '__main__':
-    args = {}
+    #args = {}
+    #print(search())
     # add_game(game_name='The Last of Us',
     #           developer='Naughty Dog',
     #           release_date='2013-06-14',
@@ -368,6 +422,9 @@ if __name__ == '__main__':
     #           password='strong')
     # log_in(login='admin',
     #        password='strong')
+
     #print(whirlpool.new(str.encode('ahegao')).hexdigest())
+
     #search(year=2004, game_name='half', developer_name='Valve Software', platform_name='P')
+
     run_server(port=8000)
