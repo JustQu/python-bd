@@ -102,7 +102,7 @@ INSERT INTO `users` (`login`, `group`)
 
 INSERT INTO `user_passwd`(`user_id`, `user_passwd`, `auth_tok`)
 	VALUES
-	(1, 'ahegao', '69randomshit');
+	(1, '4d9dfca096f6b6cc672707a80f3a42a96ddcf488972e61163858348b69b747df48462c58db26afb82a84dbf1f5073065d5d9083e3c8e114a112dd45cf887f099', NULL);
 
 INSERT INTO `genres` (`genre_name`)
 	VALUES

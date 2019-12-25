@@ -92,12 +92,15 @@ def log_in(**kwargs):
 
     response['status'] = 'fail'
 
+    print(kwargs['password'])
+    print(whirlpool.new(str.encode(kwargs['password'])))
     if record != ():
+        print(record)
         record = record[0]
         if 'auth_token' in kwargs:
             if kwargs['auth_token'] == record[4]:
                 response['status'] = 'success'
-        elif record[3] == whirlpool.new(str.encode(kwargs['password'])):
+        elif record[3] == whirlpool.new(str.encode(kwargs['password'])).hexdigest():
             response['auth_token'] = str(uuid4())
             response['group'] = record[2]
             response['status'] = 'success'
@@ -174,7 +177,7 @@ def add_game(**kwargs):
         INSERT IGNORE INTO `games`(`game_name`, `release_date`, `rating`, `description`)
             SELECT '%(name)s'
             ,'%(release)s'
-            ,'%(rating)s'
+            ,'%(rating)d'
             ,'%(description)s';
     ''' % {'name': kwargs['game_name'],
           'release': kwargs['release_date'],
@@ -265,16 +268,47 @@ def search(**kwargs):
 
     query += ''' ORDER BY `rating` DESC;'''
 
-    print(query)
+    #print(query)
 
     cursor.execute(query)
     result = cursor.fetchall()
-    for row in result:
-        print(row)
+    #for row in result:
+    #   print(row)
     return result
+
+def change_password(login, password, new_password):
+    response = {}
+    response['status'] = 'fail'
+
+    query = '''
+        SELECT `login`, `user_passwd`
+        FROM `users` JOIN `user_passwd` ON `users`.`id` = `user_passwd`.`user_id`
+        WHERE `users`.`login` = '%(login)s';
+    ''' % {'login': login}
+
+    cursor.execute(query)
+    result = cursor.fetchall()
+
+    if result != ():
+        if result[1] != whirlpool.new(str.encode(password)).hexdigest():
+            response['message'] = 'Wrong password'
+            return response
+        
+    else:
+        response['message'] = 'User not found'
+        return response
+    pass
 
 
 def get_game_info():
+
+    #get game_name release_date rating description
+    query1 = '''
+        INSERT
+    '''
+    #get_genres
+    #get_developer
+    #get_publisher
     pass
 
 
@@ -331,9 +365,9 @@ if __name__ == '__main__':
     #           genres=['action', 'shooter'])
 
     # register(login='admin',
-    #          password='strong')
+    #           password='strong')
     # log_in(login='admin',
-    #       password='strong')
-
-    search(year=2004, game_name='half', developer_name='Valve Software', platform_name='P')
-    #run_server(port=8000)
+    #        password='strong')
+    #print(whirlpool.new(str.encode('ahegao')).hexdigest())
+    #search(year=2004, game_name='half', developer_name='Valve Software', platform_name='P')
+    run_server(port=8000)
