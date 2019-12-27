@@ -355,6 +355,7 @@ def get_game_info(**kwargs):
         WHERE game_id = '%(game_id)d'
     ''' % {'game_id': game_id})
     response['developer'] = cursor.fetchall()
+    response['developer'] = response['developer'][0][0]
 
     #get_publisher
     cursor.execute('''
@@ -364,6 +365,15 @@ def get_game_info(**kwargs):
         WHERE game_id = '%(game_id)d'
     ''' % {'game_id': game_id})
     response['publishers'] = cursor.fetchall()
+    
+    cursor.execute('''
+        SELECT platform_name
+        FROM platforms
+        JOIN game_platform USING(platform_id)
+        WHERE game_id = '%(game_id)d'
+    ''' % {'game_id': game_id})
+    response['platforms'] = cursor.fetchall()
+
     response['status'] = 'success'
     return response
 

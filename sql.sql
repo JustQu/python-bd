@@ -145,7 +145,6 @@ INSERT INTO `platforms` (`platform_name`)
 -- 	,'12/10 best'
 -- 	FROM `developers`
 -- 	WHERE developer_name = 'CD Projekt Red Studio';
-	
 
 -- INSERT INTO `game_publisher`(`game_id`, `publisher_id`)
 -- 	SELECT `game_id`, `publisher_id`

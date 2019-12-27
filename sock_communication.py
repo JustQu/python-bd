@@ -1,6 +1,8 @@
 import pickle
 import struct
 
+from socket import socket, AF_INET, SOCK_STREAM
+
 def send_msg(sock, data_to_pack):
     print(data_to_pack)
     data = pickle.dumps(data_to_pack)
@@ -26,3 +28,20 @@ def recvall(sock, n):
             return None
         data.extend(packet)
     return data
+
+#connecting to the server
+host = 'localhost'
+port = 8000
+addr = (host, port)
+
+request = {}
+
+def get_response(request):
+    tcp_socket = socket(AF_INET, SOCK_STREAM)
+    tcp_socket.connect(addr)
+    send_msg(tcp_socket, request)
+    response = recv_msg(tcp_socket)
+    tcp_socket.close()
+    response = pickle.loads(response)
+    print(response)
+    return response

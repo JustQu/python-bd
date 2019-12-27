@@ -29,6 +29,7 @@ from kivy.uix.popup import Popup
 import pickle
 
 import sock_communication as sc
+from sock_communication import get_response
 
 from os import environ
 from platform import system
@@ -36,25 +37,6 @@ from platform import system
 if system() == 'Linux':
     #for remote desktop
     environ['DISPLAY'] = ":0.0"
-
-
-#connecting to the server
-host = 'localhost'
-port = 8000
-addr = (host, port)
-
-request = {}
-
-
-def get_response(request):
-    tcp_socket = socket(AF_INET, SOCK_STREAM)
-    tcp_socket.connect(addr)
-    sc.send_msg(tcp_socket, request)
-    response = sc.recv_msg(tcp_socket)
-    tcp_socket.close()
-    response = pickle.loads(response)
-    print(response)
-    return response
 
 
 def error_popup(error_message):
@@ -264,7 +246,6 @@ class RV(RecycleView):
                              'game_year': str(game_info[2]),
                              'game_developer': game_info[3]})
         else:
-            print('her')
             self.popup = Popup(title='Test popup',
                     content=Label(text='Hello world'),
                     size_hint=(None, None), size=(400, 400))
@@ -322,9 +303,26 @@ class clientApp(App):
         if response['status'] == 'success':
             self.game_name = response['game_name']
             genres = []
+            platforms = []
+            publishers = []
+
             for genre in response['genres']:
                 genres.append(genre[0])
             self.genres = ', '.join(genres)
+
+            for platform in response['platforms']:
+                platforms.append(platform[0])
+            self.platforms = ', '.join(platforms)
+
+            for publisher in response['publishers']:
+                publishers.append(publisher[0])
+            self.publishers = ', '.join(publishers)
+
+            self.developer = response['developer']
+
+            self.score = str(response['game_score'])
+
+            self.description = response['description']
         self.sm.go_to_game_page()
 
 
