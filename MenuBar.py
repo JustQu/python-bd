@@ -1,32 +1,9 @@
-from socket import socket, AF_INET, SOCK_STREAM
-
-from kivy.app import App
-from kivy.uix.image import Image
-from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.properties import ObjectProperty, BooleanProperty, StringProperty
-from kivy.uix.recycleview import RecycleView
-from kivy.uix.behaviors import FocusBehavior
-from kivy.uix.recycleboxlayout import RecycleBoxLayout
-from kivy.uix.recycleview.layout import RecycleDataViewBehavior
-from kivy.uix.recycleview.layout import LayoutSelectionBehavior
-from kivy.uix.label import Label
-from kivy.uix.popup import Popup
+from kivy.properties import BooleanProperty, ObjectProperty
 from kivy.lang.builder import Builder
 
-import pickle
-
-import sock_communication as sc
 from sock_communication import get_response
-
-from os import environ
-from platform import system
-
-if system() == 'Linux':
-    #for remote desktop
-    environ['DISPLAY'] = ":0.0"
 
 Builder.load_file('MenuBar.kv')
 
@@ -34,8 +11,6 @@ class MenuBar(BoxLayout):
     admin = BooleanProperty(False)
 
     loged_in = BooleanProperty(False)
-    login = ObjectProperty(None)
-    password = ObjectProperty(None)
 
     user_field = ObjectProperty(None)
     login_field = ObjectProperty(None)

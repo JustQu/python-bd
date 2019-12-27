@@ -10,7 +10,6 @@
 		size: self.texture_size
 		text_size: self.size
 		pos_hint: {'x': .1, 'y': .5}
-		#text: app.user_login
 	Button:
 		size_hint_x: .15
 		pos_hint: {'x': 0.85}
@@ -105,13 +104,13 @@
 
 	UserField:
 		id: user_field
-		size_hint_y: None
-		height: 0
-		opacity: 0
+		size_hint_y: None if not root.loged_in else 1
+		height: 0 if not root.loged_in else 40
+		opacity: 0 if not root.loged_in else 1 
 	#	size_hint_y: 0.3
 	LoginField:
 		id: login_field
-	#	size_hint_y: 0.3
+		size_hint_y: 1 if not root.loged_in else 0
 	RegisterField:
 		size_hint_y: None
 		height: 0

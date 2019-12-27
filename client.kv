@@ -5,7 +5,13 @@
 	id: 'screen_manager'
 	RootWidget:
 	GamePage:
+		Button:
+			text: 'back'
+			size_hint: .1,.1
+			pos: 0, 0
+			on_press: root.go_to_main_page()
 	NewGamePage:
+
 
 <NewGamePage>:
 	name: 'new_game_page'
@@ -117,99 +123,7 @@
 			text: 'добавить игру'
 			size_hint_x: .15
 			pos_hint: {'x': .84}
-
-<GameTitle@RelativeLayout>:
-	canvas.before:
-        Color:
-            rgba: .6, .2, .9, 1
-        Rectangle:
-            size: self.size
-            #pos: self.pos
-	text: ''
-	Label:
-		size: self.texture_size
-		font_size: 55
-		size_hint_x: None
-		#text_size: self.size
-		halign: 'left'
-		pos_hint: {'center_y': .5, 'left': 1}
-		text: root.text
-
-
-<GameInfo@Widget>:
-	canvas.before:
-        Color:
-            rgba: .6, .2, .3, 1
-        Rectangle:
-            size: self.size
-            #pos: self.pos
-	BoxLayout:
-		orientation: 'vertical'
-		
-		# Label:
-		# 	text: 'Платформы:' + app.platforms
-		# 	font_size: 15
-		# 	size_hint_y: None
-		# 	default_size_hint: 1, None
-		# 	height: 3
-		# 	halign: 'left'
-		# 	valign: 'top'
-		# 	size: self.texture_size
-		# 	text_size: self.size
-		# Label:
-		# 	text: 'Разработчик:' + app.developer
-		# 	font_size: 15
-		# 	size_hint_y: None
-		# 	default_size_hint: 1, None
-		# 	height: 3
-		# 	halign: 'left'
-		# 	valign: 'top'
-		# 	size: self.texture_size
-		# 	text_size: self.size
-		# Label:
-		# 	text: 'Издатель:' + app.publishers
-		# 	font_size: 15
-		# 	size_hint_y: None
-		# 	default_size_hint: 1, None
-		# 	height: 3
-		# 	halign: 'left'
-		# 	valign: 'top'
-		# 	size: self.texture_size
-		# 	text_size: self.size
-
-<GamePage>:
-	name: 'game_page'
-	BoxLayout:
-		orientation: 'vertical'
-		minimum_height: 300
-		Button:
-			size_hint: .1, .1
-			text: 'back'
-			on_press: root.parent.go_to_main_page()
-		GameTitle:
-			size_hint_y: .25
-			text: app.game_name
-		BoxLayout:
-			orientation: 'vertical'
-			Label:
-				canvas.before:
-					Color:
-            			rgba: .4, .8, .3, 1
-        			Rectangle:
-            			size: self.size
-				size: self.texture_size
-				size_hint_x: None
-				halign: 'left'
-				text: 'Жанры:' + app.genres
-				pos_hint: {'left': 1, 'top': 1}
-				#font_size: 15
-				#size_hint_y: None
-				#default_size_hint: 1, None
-				#text_size: self.size
-		Button:
-			size_hint: .1, .1
-			text: 'back'
-			on_press: root.parent.go_to_main_page()
+			
 
 <GameRow>:
 	canvas.before:
@@ -277,125 +191,6 @@
 		Color:
 			rgba: .6, .2, .3, 1
 		Rectangle:
-			size: self.size
-
-<UserField>:
-	canvas.before:
-		Color:
-			rgba: 0.22, 0.40, 0.69, 1
-		Rectangle:
-			size: self.size
-	Label:
-		size: self.texture_size
-		text_size: self.size
-		pos_hint: {'x': .1, 'y': .5}
-		text: app.user_login
-	Button:
-		size_hint_x: .15
-		pos_hint: {'x': 0.85}
-		text: 'Выйти'
-
-<LoginField>:
-	login: loginInput
-	password: passwdInput
-	canvas.before:
-		Color:
-			rgba: 0.22, 0.40, 0.69, 1
-		Rectangle:
-			size: self.size
-	Button:
-		size_hint: None, .6
-		width: 160
-		text: 'Регистрация'
-		on_press: root.parent.show_register()
-		#size: self.texture_size
-	TextInput:
-		id: loginInput
-		multiline: False
-		pos_hint: {'x': .45, 'center_y': .5}
-		size_hint: .2, .6
-		write_tab: False
-		hint_text: 'login'
-	TextInput:
-		id: passwdInput
-		multiline: False
-		password: True
-		hint_text: 'password'
-		write_tab: False
-		pos_hint: {'x': .65, 'center_y': .5}
-		size_hint: .2, .6
-	Button:
-		text: "войти"
-		size_hint: .1, .6
-		pos_hint: {'x': .87, 'center_y': .5}
-		on_press: root.parent.log_in(loginInput.text, passwdInput.text)
-
-<RegisterField>:
-	size_hint_y: 0
-	canvas.before:
-		Color:
-			rgba: 0.22, 0.40, 0.69, 1
-		Rectangle:
-			size: self.size
-	TextInput:
-		id: loginInput
-		multiline: False
-		pos_hint: {'x': .17, 'center_y': .5}
-		size_hint: .2, .6
-		write_tab: False
-		hint_text: 'login'
-	TextInput:
-		id: passwdInput
-		multiline: False
-		password: True
-		hint_text: 'password'
-		write_tab: False
-		pos_hint: {'x': .38, 'center_y': .5}
-		size_hint: .2, .6
-	TextInput:
-		id: passwdInput2
-		multiline: False
-		password: True
-		hint_text: 'submit password'
-		write_tab: False
-		pos_hint: {'x': .59, 'center_y': .5}
-		size_hint: .2, .6
-	Button:
-		text: "Зарегистрироваться"
-		pos_hint: {'x': .80, 'center_y': .5}
-		size_hint_y: .6
-		size_hint_x: None
-		width: 150
-		on_press: root.parent.register(loginInput.text, passwdInput.text, passwdInput2.text)
-	Button:
-		text: 'назад'
-		size_hint_y: .6
-		size_hint_x: .1
-		pos_hint: {'x': 0.05, 'center_y': 0.5}
-		on_press: root.parent.show_login()
-
-
-<MenuBar>:
-	#pos: self.pos
-	orientation: 'vertical'
-	user_field: user_field
-	login_field: login_field
-	register_field: register_field
-
-	UserField:
-		id: user_field
-		size_hint_y: None
-		height: 0
-		opacity: 0
-	#	size_hint_y: 0.3
-	LoginField:
-		id: login_field
-	#	size_hint_y: 0.3
-	RegisterField:
-		size_hint_y: None
-		height: 0
-		opacity: 0
-		id: register_field
 
 
 <SearchEngine>:
