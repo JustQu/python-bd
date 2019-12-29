@@ -10,10 +10,6 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.properties import ObjectProperty, BooleanProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
-
-from os import environ
-environ['DISPLAY'] = ':0.0'
-
 import MenuBar
 
 Builder.load_file('writereview.kv')
@@ -22,9 +18,9 @@ class WriteReviewPage(Screen):
     pass
 
 
-class testApp(App):
-    def build(self):
-        return WriteReviewPage()
+# class testApp(App):
+#     def build(self):
+#         return WriteReviewPage()
 
-if __name__ == '__main__':
-    testApp().run()
+# if __name__ == '__main__':
+#     testApp().run()

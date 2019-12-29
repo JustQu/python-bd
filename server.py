@@ -109,6 +109,7 @@ def log_in(**kwargs):
                 SET `auth_tok` = '{response['auth_token']}'
                 WHERE user_id =  '{record[0]}';
                 ''')
+            mariadb_connection.commit()
 
     return response
 
@@ -169,6 +170,9 @@ def register(**kwargs):
 def add_game(**kwargs):
     '''game_name developer release rating description publishers platforms '''
 
+    response = {}
+    response['status'] = 'fail'
+
     cursor.execute('''
         INSERT IGNORE INTO `developers`(`developer_name`)
             SELECT
@@ -217,7 +221,7 @@ def add_game(**kwargs):
         INSERT INTO `game_developer`(`game_id`, `developer_id`)
         SELECT `game_id`, `developer_id` FROM `games`, `developers`
         WHERE `game_name` = '%(name)s'
-        AN#D `developer_name` = '%(developer)s';
+        AND `developer_name` = '%(developer)s';
     ''' % {'name': kwargs['game_name'],
           'developer': kwargs['developer']})
 
@@ -231,6 +235,8 @@ def add_game(**kwargs):
               'platform': platform})
 
     mariadb_connection.commit()
+    response['status'] = 'success'
+    return response
     # for image in kwargs['images']:
     #     cursor.execute('''
     #         INSERT INTO `pictures`(`game_id`, `source`)
@@ -248,7 +254,7 @@ def search(**kwargs):
         `genre_name`
         `developer_name`
         `year`
-        `paltforn_name`
+        `paltform_name`
     Retruns:
         dict: словарь с ключом `status`. Если `status` = 'success'
             то список игр с ключом `game_list`
@@ -263,29 +269,38 @@ def search(**kwargs):
         JOIN `game_publisher` USING(`game_id`) JOIN `publishers` USING(`publisher_id`)
         JOIN `game_developer` USING(`game_id`) JOIN `developers` USING(`developer_id`)
     '''
-    if 'game_name' in  kwargs:
+    if 'game_name' in  kwargs and kwargs['game_name'] != '':
         query += '''WHERE game_name LIKE '%%%(game_name)s%%'
         ''' % {'game_name': kwargs['game_name']}
     else:
         query += '''WHERE game_name LIKE '%%%%' '''
 
-    if 'genre_name' in  kwargs:
+    if 'genre_name' in  kwargs and kwargs['genre_name'] != '':
         query += ''' AND genre_name = '%(genre_name)s'
         ''' % {'genre_name': kwargs['genre_name']}
 
-    if 'developer_name' in  kwargs:
+    if 'developer_name' in  kwargs and kwargs['developer_name'] != '':
         query += ''' AND developer_name='%(developer_name)s'
         ''' % {'developer_name': kwargs['developer_name']}
 
-    if 'year' in  kwargs:
+    if 'year' in  kwargs and kwargs['year'] != '':
         query += ''' AND YEAR(release_date)='%(year)s'
         ''' % {'year': kwargs['year']}
 
-    if 'platform_name' in  kwargs:
+    if 'platform_name' in  kwargs and kwargs['platform_name'] != '':
         query += ''' AND platform_name='%(platform)s'
         ''' % {'platform': kwargs['platform_name']}
-
-    query += ''' ORDER BY `rating` DESC;'''
+    if 'sort' in  kwargs and kwargs['sort'] != 'Сортировка':
+        if kwargs['sort'] == 'По имени возр.':
+            query += ''' ORDER BY `game_name` ASC;'''
+        if kwargs['sort'] == 'По имени уб.':
+            query += ''' ORDER BY `game_name` DESC;'''
+        if kwargs['sort'] == 'По рейтингу возр.':
+            query += ''' ORDER BY `rating` ASC;'''
+        if kwargs['sort'] == 'По рейтингу уб.':
+            query += ''' ORDER BY `rating` DESC;'''
+    else:
+        query += ''' ORDER BY `rating` DESC;'''
 
     #print(query)
 
@@ -297,28 +312,38 @@ def search(**kwargs):
     response['game_list'] = result
     return response
 
-def change_password(login, password, new_password):
+def change_password(**kwargs):
+    '''login, old_password, new_password'''
+
     response = {}
     response['status'] = 'fail'
-
+    if 'login' not in kwargs or 'old_password' not in kwargs or 'new_password' not in kwargs:
+        return response
     query = '''
-        SELECT `login`, `user_passwd`
+        SELECT `id`, `login`, `user_passwd`
         FROM `users` JOIN `user_passwd` ON `users`.`id` = `user_passwd`.`user_id`
         WHERE `users`.`login` = '%(login)s';
-    ''' % {'login': login}
+    ''' % {'login': kwargs['login']}
 
     cursor.execute(query)
     result = cursor.fetchall()
-
+    print(result)
     if result != ():
-        if result[1] != whirlpool.new(str.encode(password)).hexdigest():
+        result = result[0]
+        if result[2] != whirlpool.new(str.encode(kwargs['old_password'])).hexdigest():
             response['message'] = 'Wrong password'
             return response
-        
+        cursor.execute('''
+        UPDATE `user_passwd`
+        SET `user_passwd` = %s
+        WHERE `user_id` = %s
+        ''', (whirlpool.new(str.encode(kwargs['new_password'])).hexdigest(), result[0],))
+        mariadb_connection.commit()
     else:
         response['message'] = 'User not found'
         return response
-    pass
+    response['status'] = 'success'
+    return response
 
 
 def get_game_info(**kwargs):
@@ -378,12 +403,80 @@ def get_game_info(**kwargs):
     return response
 
 
+def write_review(**kwargs):
+    response = {}
+    response['status'] = 'fail'
+
+    if 'auth_token' not in kwargs or 'text' not in kwargs or 'score' not in kwargs:
+        print('here')
+        return response
+
+    cursor.execute('''
+        select id, login
+        from users
+        join user_passwd on users.id = user_passwd.user_id
+        where auth_tok = '%(token)s'
+    ''' % {'token': kwargs['auth_token']})
+    login = cursor.fetchall()
+    print(login)
+    if login == ():
+        print('her')
+        return response
+    
+    query = '''
+    insert INTO reviews(user_id, game_id, user_rating, text)
+    select '%(user_id)d', '%(game_id)s', '%(user_rating)d', '%(text)s';
+    ''' % {'user_id':  login[0][0],
+            'game_id': kwargs['game_id'],
+            'user_rating': kwargs['score'],
+            'text': kwargs['text']}
+    print(query)
+    cursor.execute('''
+    insert INTO reviews(user_id, game_id, user_rating, text)
+    select '%(user_id)s', '%(game_id)s', '%(user_rating)d', '%(text)s';
+    ''' % {'user_id': login[0][0],
+            'game_id': kwargs['game_id'],
+            'user_rating': kwargs['score'],
+            'text': kwargs['text']})
+    mariadb_connection.commit()
+    response['status'] = 'success'
+
+    return response
+
+
+def get_reviews(**kwargs):
+    response = {}
+    response['status'] = 'fail'
+
+    print(kwargs)
+
+    if 'game_id' not in kwargs:
+        return response
+
+    cursor.execute("""
+    SELECT login, user_rating, text
+    FROM reviews
+    JOIN users ON reviews.user_id = users.id
+    JOIN games USING(game_id)
+    WHERE game_id = %s
+    """, (str(kwargs['game_id']),))
+    response['reviews'] = cursor.fetchall()
+
+    if response['reviews'] == ():
+        return response
+    response['status'] = 'success'    
+    return response
+
+
 Exec_request = {
-    "login": log_in,
+    'login': log_in,
     'register': register,
     'add_game': add_game,
     'search': search,
-    'get_game_info': get_game_info
+    'get_game_info': get_game_info,
+    'write_review': write_review,
+    'get_reviews': get_reviews,
+    'change_password': change_password
 }
 
 

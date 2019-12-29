@@ -8,8 +8,15 @@
 	orientation: 'vertical'
 	Label:
 		text: 'Отзыв: '
+		font_size: 20
+		size_hint_y: .1
+		halign: 'left'
+		valign: 'center'
+		text_size: self.size
 	TextInput:
+		id: text
 	BoxLayout:
+		size_hint_y: .1
 		orientation: 'horizontal'
 		Label:
 			text: 'Оценка: '
@@ -22,7 +29,20 @@
 			text: str(int(score.value)) + ' / 10'
 	Button:
 		text: 'Оставить отзыв'
+		size_hint: None, None
+		size: 150, 50
+		pos_hint: {'x': .75}
+		on_press: app.write_review(text.text, score.value); app.rw.sm.current='game_page'
+	Button:
+		text: 'Назад'
+		size_hint: None, None
+		pos_hint_x: 0
+		size: 50, 50
+		on_press: app.rw.sm.current = 'game_page'
+
+
 		
 
 <WriteReviewPage>:
+	name: 'write_review_page'
 	WriteReview:

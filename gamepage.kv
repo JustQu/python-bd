@@ -38,8 +38,11 @@
 			pos: self.pos
 	Button:
 		text: 'Отзывы'
+		on_press: app.rw.sm.go_to_reviews_page(app.game_id)#app.rw.sm.current = 'reviews_page'
 	Button:
 		text: 'Написать отзыв'
+		on_press: app.rw.sm.go_to_write_review()
+		#on_press: app.rw.sm.current = 'write_review_page'
 
 <GameInfo@BoxLayout>:
 	orientation: 'horizontal'
@@ -81,15 +84,22 @@
 	Label:
 		canvas.before:
 			Color:
-				rgba: 0, 1, 0.0, 1
+				rgba: 0.3, 0.6, 0.9, 1
 			Rectangle:
 				size: self.size
 				pos: self.pos
+		# canvas.before:
+		# 	Color:
+		# 		rgba: 0, 1, 0.0, 1
+		# 	Rectangle:
+		# 		size: self.size
+		# 		pos: self.pos
 		#size_hint_y: None
 		#pos_hint: {'center_y': 1}
 		valign: 'top'
 		#size_hint_y: 1
 		text_size: self.size
+		font_size: 20
 		size: self.texture_size
 		text: app.description
 

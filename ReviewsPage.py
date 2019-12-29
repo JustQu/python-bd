@@ -11,17 +11,11 @@ from kivy.properties import ObjectProperty, BooleanProperty, StringProperty
 from kivy.uix.screenmanager import Screen
 
 
-from os import environ
+from sock_communication import get_response
 
 import MenuBar
 
-environ['DISPLAY'] = ':0.0'
-
 Builder.load_file('ReviewsPage.kv')
-
-class SelectableRecycleBoxLayout(FocusBehavior, LayoutSelectionBehavior,
-                                 RecycleBoxLayout):
-    ''' Adds selection and focus behaviour to the view. '''
 
 
 class ViewReview(BoxLayout):
@@ -43,37 +37,36 @@ class ViewReview(BoxLayout):
     
     def update(self, *args):
         print(self.ids.login.texture_size[1], self.ids.text.texture_size[1])
-        self.height = self.ids.login.texture_size[1] + self.ids.text.texture_size[1]
+        self.height = self.ids.login.texture_size[1] + self.ids.text.texture_size[1] + self.ids.rating.texture_size[1]
         #return self.height
 
 
-class RV(RecycleView):
+class RV1(RecycleView):
     
     def __init__(self, **kwargs):
-        super(RV, self).__init__(**kwargs)
-        self.get_reviews()
+        super(RV1, self).__init__(**kwargs)
+        self.data = []
 
-    def get_reviews(self):
-        self.data = [{'login': 'pepega',
-                        'review_text': 'REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE.Replace with long text later and test. \n' * 20},
-                      {'login': 'pupa', 
-                        'review_text': 'zalupa'},
-                        {'login': 'pupa', 
-                        'review_text': 'zalupa'},
-                        {'login': 'pupa', 
-                        'review_text': 'zalupa'},
-                        {'login': 'pupa', 
-                        'review_text': 'zalupa'}]
+    def get_reviews(self, game_id):
+        self.data =[]
+        request = {}
+        request['type'] = 'get_reviews'
+        request['game_id'] = game_id
+        response = get_response(request)
+        print(response)
+        for review in response['reviews']:
+            self.data.append({'login': review[0], 'rating': str(review[1]), 'review_text': review[2]})
         #self.data = [{'text': str(x)} for x in range(100)]
         
 
-class ReviewsPageApp(App):
-    def build(self):
-        self.rv = RV()
-        return RV()
+# class ReviewsPageApp(App):
+#     def build(self):
+#         self.rv = RV1()
+#         return RV1()
 
 class ReviewsPage(Screen):
+    rv = ObjectProperty(None)
     pass
 
-if __name__ == '__main__':
-    ReviewsPageApp().run()
+# if __name__ == '__main__':
+#     ReviewsPageApp().run()

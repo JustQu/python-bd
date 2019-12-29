@@ -7,13 +7,22 @@
 		Rectangle:
 			size: self.size
 	Label:
+		text: root.parent.user_login
 		size: self.texture_size
 		text_size: self.size
 		pos_hint: {'x': .1, 'y': .5}
 	Button:
+		size_hint_x: .20
+		size_hint_y: .6
+		pos_hint: {'x': 0.65, 'center_y': .5}
+		text: 'Поменять пароль'
+		on_press: root.parent.show_change_password()
+	Button:
 		size_hint_x: .15
-		pos_hint: {'x': 0.85}
+		size_hint_y: .6
+		pos_hint: {'x': 0.85, 'center_y': .5}
 		text: 'Выйти'
+		on_press: root.parent.log_out(); root.parent.sm.current = root.parent.main_page
 
 <LoginField>:
 	login: loginInput
@@ -25,6 +34,7 @@
 			size: self.size
 	Button:
 		size_hint: None, .6
+		pos_hint: {'center_y': 0.5}
 		width: 160
 		text: 'Регистрация'
 		on_press: root.parent.show_register()
@@ -97,11 +107,14 @@
 
 <MenuBar>:
 	#pos: self.pos
+	sm: None
+	main_page: ''
 	a: app
 	orientation: 'vertical'
 	user_field: user_field
 	login_field: login_field
 	register_field: register_field
+	change_password_field: change_password
 	UserField:
 		id: user_field
 		size_hint_y: None if not root.loged_in else 1
@@ -116,3 +129,46 @@
 		height: 0
 		opacity: 0
 		id: register_field
+	ChangePassword:
+		size_hint_y: None
+		height: 0
+		opacity: 0
+		id: change_password
+
+
+<ChangePassword>:
+	size_hint_y: 0
+	canvas.before:
+		Color:
+			rgba: 0.22, 0.40, 0.69, 1
+		Rectangle:
+			size: self.size
+	TextInput:
+		id: passwdInput
+		multiline: False
+		password: True
+		hint_text: 'new password'
+		write_tab: False
+		pos_hint: {'x': .38, 'center_y': .5}
+		size_hint: .2, .6
+	TextInput:
+		id: passwdInput2
+		multiline: False
+		password: True
+		hint_text: 'old password'
+		write_tab: False
+		pos_hint: {'x': .59, 'center_y': .5}
+		size_hint: .2, .6
+	Button:
+		text: "Поменять пароль"
+		pos_hint: {'x': .80, 'center_y': .5}
+		size_hint_y: .6
+		size_hint_x: None
+		width: 150
+		on_press: root.parent.change_password(passwdInput.text, passwdInput2.text)
+	Button:
+		text: 'назад'
+		size_hint_y: .6
+		size_hint_x: .1
+		pos_hint: {'x': 0.05, 'center_y': 0.5}
+		on_press: root.parent.show_login()

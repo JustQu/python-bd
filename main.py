@@ -36,17 +36,14 @@ from platform import system
 
 import MenuBar
 import GamePage
+import ReviewsPage
+import WriteReviewPage
 
 if system() == 'Linux':
     #for remote desktop
     environ['DISPLAY'] = ":0.0"
 
-
-def error_popup(error_message):
-    popup = Popup(title='Error',
-                content=Label(text=error_message),
-                auto_dismiss=True)
-    popup.open()
+from error_popup import error_popup
 
 class SearchEngine(BoxLayout):
     pass
@@ -99,8 +96,24 @@ class AdminPanel(RelativeLayout):
 
 
 class NewGamePage(BoxLayout, Screen):
-    pass
 
+    def add_game(self, **kwargs):
+        request = {}
+        request['type'] = 'add_game'
+        request['game_name'] = kwargs['game_name']
+        request['genres'] = {x.strip() for x in kwargs['genres'].split(';')}
+        request['developer'] = kwargs['developer']
+        request['publishers'] = {x.strip() for x in kwargs['publishers'].split(';')}
+        request['platforms'] = {x.strip() for x in kwargs['platforms'].split(';')}
+        request['rating'] = kwargs['rating']
+        request['release_date'] = kwargs['release_date']
+        request['description'] = kwargs['description']
+        response = get_response(request)
+        if response['status'] != 'success':
+            print("Fail")
+
+class InputFileDropDown(BoxLayout):
+    pass
 
 #list of games
 class RV(RecycleView):
@@ -117,7 +130,9 @@ class RV(RecycleView):
     def search(self, **kwargs):
         request = {}
         request['type'] = 'search'
-    
+        if kwargs is not None:
+            request.update(kwargs) 
+        #print(request['kwargs'])
         try:
             response = get_response(request)
         except:
@@ -132,7 +147,7 @@ class RV(RecycleView):
                 self.data.append({'game_id': game_info[0],
                              'game_name': game_info[1],
                              'game_year': str(game_info[2]),
-                             'game_developer': game_info[3]})
+                             'game_score': str(game_info[3])})
         else:
             self.popup = Popup(title='Test popup',
                     content=Label(text='Hello world'),
@@ -142,18 +157,20 @@ class RV(RecycleView):
 
 class MainPage(BoxLayout, Screen):
     sm = ObjectProperty(None)
+    rv = ObjectProperty(None)
 
 
 class RootWidget(BoxLayout):
     sm = ObjectProperty(None)
+    mb = ObjectProperty(None)
 
 class MyScreenManager(ScreenManager):
- 
+    rvws = ObjectProperty(None)
+
     def __init__(self, **kwargs):
         super(MyScreenManager, self).__init__(**kwargs)
 
     def go_to_game_page(self):
-        print('here')
         self.current = 'game_page'
 
     def go_to_main_page(self):
@@ -161,6 +178,16 @@ class MyScreenManager(ScreenManager):
 
     def go_to_new_game_page(self):
         self.current = 'new_game_page'
+
+    def go_to_write_review(self):
+        if not self.parent.mb.loged_in:
+            error_popup('Чтобы оставить отзыв вы должны быть авторизованы.')
+        else:
+            self.current = 'write_review_page'
+
+    def go_to_reviews_page(self, game_id):
+        self.rvws.rv.get_reviews(game_id)
+        self.current = 'reviews_page'
 
 
 class clientApp(App):
@@ -186,10 +213,18 @@ class clientApp(App):
     def build(self):
         self.rw = RootWidget()
         return self.rw
-        #self.sm = MyScreenManager()
-       # return self.sm
+
+    def write_review(self, text, score):
+        request = {}
+        request['type'] = 'write_review'
+        request['game_id'] = self.game_id
+        request['text'] = text
+        request['score'] = score
+        request['auth_token'] = self.rw.mb.auth_token
+        response = get_response(request)
 
     def load_game_page(self, game_id):
+        self.game_id = game_id
         print(game_id)
         request = {}
         request['type'] = 'get_game_info'

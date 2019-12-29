@@ -3,7 +3,11 @@
 <RootWidget>:
 	orientation: 'vertical'
 	sm: screen_manager
+	mb: menu_bar
 	MenuBar:
+		sm: screen_manager
+		main_page: 'main_page'
+		id: menu_bar
 		a: app
 		size_hint_y: .1
 	MyScreenManager:
@@ -11,6 +15,7 @@
 
 <MyScreenManager>:
 	name: 'screen_manager2'
+	rvws: rvws
 	#id: screen_manager
 	MainPage:
 	GamePage:
@@ -20,7 +25,9 @@
 			pos: 0, 0
 			on_press: root.go_to_main_page()
 	NewGamePage:
-
+	ReviewsPage:
+		id: rvws
+	WriteReviewPage:
 
 <NewGamePage>:
 	name: 'new_game_page'
@@ -47,7 +54,7 @@
 			pos_hint: {'center_y': 1}
 			text: 'Жанры:'
 		TextInput:
-			id: game_name
+			id: genres
 			multiline: False
 			write_tab: False
 
@@ -60,7 +67,7 @@
 			pos_hint: {'center_y': 1}
 			text: 'Разработчик:'
 		TextInput:
-			id: game_name
+			id: developer
 			multiline: False
 			write_tab: False
 
@@ -73,7 +80,7 @@
 			pos_hint: {'center_y': 1}
 			text: 'Издатели:'
 		TextInput:
-			id: game_name
+			id: publishers
 			multiline: False
 			write_tab: False
 
@@ -86,10 +93,21 @@
 			pos_hint: {'center_y': 1}
 			text: 'Платформы:'
 		TextInput:
-			id: game_name
+			id: platforms
 			multiline: False
 			write_tab: False
-		
+	BoxLayout:
+		size_hint: 1, .1
+		orientation: 'horizontal'
+		Label:
+			text_size: self.size
+			size_hint_x: .15
+			pos_hint: {'center_y': 1}
+			text: 'Дата выхода:'
+		TextInput:
+			id: release_date
+			multiline: False
+			write_tab: False
 	BoxLayout:
 		size_hint: 1, .1
 		orientation: 'horizontal'
@@ -99,16 +117,16 @@
 			pos_hint: {'center_y': 1}
 			text: 'Оценка:'
 		Slider:
-			id: grade
+			id: rating
 			min:0
-			max: 1000
+			max: 100
 			step: 1
 			orientation: 'horizontal'
 		Label:
 			text_size: self.size
 			size_hint_x: .15
 			pos_hint: {'center_y': 1}
-			text: '%.2f / 10' % (grade.value / 100.00)
+			text: '%.2f / 10' % (rating.value / 100.00)
 
 	BoxLayout:
 		size_hint: 1, .3
@@ -119,9 +137,10 @@
 			pos_hint: {'center_y': 1}
 			text: 'Описание:'
 		TextInput:
-			id: game_name
+			id: description
 			multiline: True
 			write_tab: False
+			
 	RelativeLayout:
 		size_hint: 1, .1
 		Button:
@@ -132,6 +151,7 @@
 			text: 'добавить игру'
 			size_hint_x: .15
 			pos_hint: {'x': .84}
+			on_press: root.add_game(game_name=game_name.text,genres=genres.text,developer=developer.text,publishers=publishers.text,platforms=platforms.text,rating=rating.value,release_date=release_date.text,description=description.text);app.rw.sm.current='main_page'
 			
 
 <GameRow>:
@@ -142,6 +162,7 @@
         Rectangle:
             size: self.size
             pos: self.pos
+	game_score: ''
 	game_name: ''
 	game_genre: ''
 	game_year: ''
@@ -149,12 +170,11 @@
 		text: root.game_name
 		on_touch_down:  pass
 	Label:
-		text: root.game_genre
-		on_touch_down: pass
-	Label:
 		text: root.game_year
 		on_touch_down: pass
-
+	Label:
+		text: root.game_score
+		on_touch_down: pass
 
 <RV>:
 	pepega: pepega
@@ -174,6 +194,7 @@
 <MainPage>:
 	name: 'main_page'
 	orientation: 'vertical'
+	rv: rv
 	canvas.before:
 		Color:
 			rgba: .6, .2, .3, 1
@@ -185,7 +206,7 @@
 		size_hint: 1, .1
 	AdminPanel:
 		size_hint_y: None if not app.admin else .1
-		height: 0
+		height: 0 if not app.admin else 40
 		opacity: 0 if not app.admin else 1
 		Button:
 			#pos_hint: {'x': 2, 'y': 2} if not app.admin else {'x': 0.88, 'y': 0}
@@ -194,6 +215,7 @@
 			text: 'add game'
 			on_press: root.parent.go_to_new_game_page()
 	RV:
+		id: rv
 
 <AdminPanel>:
 	canvas.before:
@@ -202,7 +224,48 @@
 		Rectangle:
 			size: self.size
 
+<InputFileDropDown>:
+	type: btn.text
+    Button:
+        id: btn
+        text: 'Сортировать'
+        on_parent: dropdown.dismiss()
+        on_release: dropdown.open(self)
+        size_hint_y: None
+        height: 35
 
+    DropDown:
+        id: dropdown
+        on_select: btn.text = '{}'.format(args[1]);
+        Button:
+            text: 'По рейтингу возр.'
+			font_size: 15
+            size_hint_y: None
+            #size: self.texture_size
+			height: 40
+            on_release: dropdown.select(self.text);
+        Button:
+            text: 'По рейтингу уб.'
+			font_size: 15
+            size_hint_y: None
+            #size: self.texture_size
+			height: 40
+            on_release: dropdown.select(self.text)
+		Button:
+            text: 'По имени возр.'
+			font_size: 15
+            size_hint_y: None
+            #size: self.texture_size
+			height: 40
+            on_release: dropdown.select(self.text)
+		Button:
+            text: 'По имени уб.'
+			font_size: 15
+            size_hint_y: None
+            #size: self.texture_size
+			height: 40
+            on_release: dropdown.select(self.text)
+  
 <SearchEngine>:
 	canvas.before:
 		Color:
@@ -215,26 +278,36 @@
 		size_hint: None, .1
 		pos_hint: { 'x': .05, 'y': .5}
 	TextInput:
+		id: game_name
 		hint_text: 'Название игры'
 		size_hint: .15, .75
 		pos_hint: { 'x': .15, 'center_y': .5}
 	TextInput:
+		id: genre_name
 		hint_text: 'Жанр'
 		size_hint: .15, .75
 		pos_hint: { 'x': .15, 'center_y': .5}
 	TextInput:
+		id: game_year
 		hint_text: 'Год выхода'
 		size_hint: .15, .75
 		pos_hint: { 'x': .3, 'center_y': .5}
 	TextInput:
+		id: platform_name
 		hint_text: 'Платформа'
 		size_hint: .15, .75
 		pos_hint: { 'x': .3, 'center_y': .5}
 	TextInput:
+		id: developer_name
 		hint_text: 'Разработчик'
 		size_hint: .15, .75
 		pos_hint: { 'x': .3, 'center_y': .5}
+	InputFileDropDown:
+		id: sort
+		size_hint: .2, .75
+		pos_hint: { 'center_y': .5}
 	Button:
 		text: 'Найти'
 		size_hint: .15, .75
 		pos_hint: { 'x': .3, 'center_y': .5}
+		on_press: root.parent.rv.search(game_name=game_name.text, genre_name=genre_name.text, year=game_year.text,developer_name=developer_name.text, platform_name=platform_name.text, sort=sort.type)

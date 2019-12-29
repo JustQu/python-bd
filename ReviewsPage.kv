@@ -1,12 +1,14 @@
 #:kivy 1.10.0
-
+#:import hex kivy.utils.get_color_from_hex
 <ViewReview>:
 	orientation: 'vertical'
 	login: ''
 	review_text: ''
+	rating: ''
 	#size_hint: 1, None
 	login_label: login
 	text_label: text
+	rating_label: rating
 	canvas.after:
 		Color:
 			rgba: 0.5, 0.3, 0.3, 1
@@ -16,7 +18,7 @@
 	Label:
 		canvas.before:
 			Color:
-				rgba: 0.1, 0.1, 0.1, 1
+				rgba: hex('#A78682')
 			Rectangle:
 				size: self.size
 				pos: self.pos
@@ -35,7 +37,31 @@
 		# padding_y: 1
 		font_size: 20
 		text: root.login
+
 	Label:
+		canvas.before:
+			Color:
+				rgba: hex('#E7EBC5')
+			Line:
+				width: 1
+				points: self.x, self.y + self.height, self.x + self.width, self.y + self.height,
+		id: rating
+		halign: 'right'
+		valign: 'top'
+		pos_hint: {'right': 1}
+		size_hint_x: None
+		size: self.texture_size
+		size_hint_y: None
+		font_size: 25
+		text: root.rating  + ' / 10'
+	Label:
+		canvas.before:
+			Color:
+				rgba: hex('#E7EBC5')
+			Line:
+				width: 1
+				points: self.x, self.y + self.height, self.x + self.width, self.y + self.height,
+				# rectangle: self.x, self.y, self.width, self.height
 		id: text
 		font_size: 20
 		size: self.texture_size
@@ -45,7 +71,7 @@
 		text_size: self.size[0], None
 
 
-<RV>:
+<RV1>:
 	viewclass: 'ViewReview'
 	RecycleBoxLayout:
 		id: pepega
@@ -61,4 +87,20 @@
 
 <ReviewsPage>:
 	name: 'reviews_page'
-	RV:
+	rv: rv
+	canvas.before:
+		Color:
+			rgba: hex('#51344D')
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	BoxLayout:
+		orientation: 'vertical'
+		RV1:
+			id: rv
+		Button:
+			size_hint: None, None
+			size: 50, 50
+			pos_hint: {'x': 0}
+			text: 'назад'
+			on_press: app.rw.sm.current = 'game_page'
