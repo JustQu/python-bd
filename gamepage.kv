@@ -6,7 +6,7 @@
 		pos: self.pos
 		
 
-<GameTitle@FloatLayout>:
+<GameTitle@BoxLayout>:
 	text: 'Suka'
 	Label:
 		text: root.text
@@ -14,6 +14,11 @@
 		size_hint_x: None
 		size: self.texture_size
 		pos_hint: {'left': 1, 'center_y': 0.5}
+	Label:
+		font_size: 30
+		size_hint_x: None
+		size: self.texture_size
+		text: '(' + app.release_date + ')'
 
 <InfoLabel@Label>:
 	size_hint_y: .1
@@ -21,7 +26,20 @@
 	font_size: 15
 	size_hint_x: None
 	size: self.texture_size
+	#text_size: self.size
 	pos_hint: {'left': 1, 'center_y': 0.5}
+
+<Buttons@BoxLayout>:
+	canvas.before:
+		Color:
+			rgba: 0.6, 0.2, 0.3, 1
+		Rectangle:
+			size: self.size
+			pos: self.pos
+	Button:
+		text: 'Отзывы'
+	Button:
+		text: 'Написать отзыв'
 
 <GameInfo@BoxLayout>:
 	orientation: 'horizontal'
@@ -30,20 +48,50 @@
 			rgba: 0.3, 0.6, 0.9, 1
 		Rectangle:
 			size: self.size
+			pos: self.pos
 	BoxLayout:
 		size_hint_y: .25
 		pos_hint: {'top': 1}
 		orientation: 'vertical'
 		InfoLabel:
-			text: 'Жанры'
+			text: 'Жанры: ' + app.genres
 		InfoLabel:
-			text: 'Платформы'
+			text: 'Платформы: ' + app.platforms
 		InfoLabel:
-			text: 'Разработчик'
+			text: 'Разработчик: ' + app.developer
 		InfoLabel:
-			text: 'Издатель'
+			text: 'Издатели: ' + app.publishers
+		Label:
+			# canvas.before:
+			# 	Color:
+			# 		rgba: 0, 1, 0.0, 1
+			# 	Rectangle:
+			# 		size: self.size
+			# 		pos: self.pos
+			size_hint_y: .2
+			font_size: 25
+			bold: True
+			size_hint_x: None
+			#size: self.texture_size
+			#text_size: self.size
+			pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+			text: app.game_score
+		Buttons:
+			size_hint_y: .1
 	Label:
-		text: 'Description'
+		canvas.before:
+			Color:
+				rgba: 0, 1, 0.0, 1
+			Rectangle:
+				size: self.size
+				pos: self.pos
+		#size_hint_y: None
+		#pos_hint: {'center_y': 1}
+		valign: 'top'
+		#size_hint_y: 1
+		text_size: self.size
+		size: self.texture_size
+		text: app.description
 
 <GamePageLayout@BoxLayout>:
 	orientation: 'vertical'
@@ -52,29 +100,8 @@
 			rgba: 0.9, 0.5, 0.1, 1
 		Rectangle:
 			size: self.size
-	MenuBar:
-		name: 'test'
-		id: menu_bar
-		size_hint_y: .1
-	AdminPanel:
-		height: 40 if menu_bar.admin else 0
-		opacity: 1 if menu_bar.admin else 0
 	GameTitle:
 		size_hint_y: .1
-		text: 'WTF'
+		text: app.game_name
 	GameInfo:
 
-
-<AdminPanel>:
-	canvas.before:
-		Color:
-			rgba: .6, .2, .3, 1
-		Rectangle:
-			size: self.size
-	size_hint_y: None
-	height: 0
-	opacity: 0
-	Button:
-		size_hint_x: None
-		text: 'add game'
-		#on_press: root.parent.go_to_new_game_page()

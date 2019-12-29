@@ -97,11 +97,11 @@
 
 <MenuBar>:
 	#pos: self.pos
+	a: app
 	orientation: 'vertical'
 	user_field: user_field
 	login_field: login_field
 	register_field: register_field
-
 	UserField:
 		id: user_field
 		size_hint_y: None if not root.loged_in else 1

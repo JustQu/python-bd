@@ -87,7 +87,7 @@ class GameRow(RecycleDataViewBehavior, BoxLayout):
         ''' Respond to the selection of items in the view. '''
         if is_selected:
             #don't know how make it more elegant
-            rv.parent.parent.go_to_game_page()
+            client.rw.sm.go_to_game_page()
             rv.pepega.clear_selection()
             print("selection changed to {0}".format(rv.data[index]))
         else:
@@ -140,9 +140,12 @@ class RV(RecycleView):
             self.popup.open(animation=False)
 
 
-class RootWidget(BoxLayout, Screen):
+class MainPage(BoxLayout, Screen):
     sm = ObjectProperty(None)
 
+
+class RootWidget(BoxLayout):
+    sm = ObjectProperty(None)
 
 class MyScreenManager(ScreenManager):
  
@@ -150,6 +153,7 @@ class MyScreenManager(ScreenManager):
         super(MyScreenManager, self).__init__(**kwargs)
 
     def go_to_game_page(self):
+        print('here')
         self.current = 'game_page'
 
     def go_to_main_page(self):
@@ -165,6 +169,8 @@ class clientApp(App):
     admin = BooleanProperty(False)
 
     game_name = StringProperty('')
+    release_date = StringProperty('')
+    game_score = StringProperty('')
     genres = StringProperty('')
     platforms = StringProperty('')
     developer = StringProperty('')
@@ -178,8 +184,10 @@ class clientApp(App):
         super(clientApp, self).__init__(**kwargs)
 
     def build(self):
-        self.sm = MyScreenManager()
-        return self.sm
+        self.rw = RootWidget()
+        return self.rw
+        #self.sm = MyScreenManager()
+       # return self.sm
 
     def load_game_page(self, game_id):
         print(game_id)
@@ -190,6 +198,8 @@ class clientApp(App):
         print(response)
         if response['status'] == 'success':
             self.game_name = response['game_name']
+            self.release_date = str(response['release_date'])
+            self.game_score = str(response['game_score'])
             genres = []
             platforms = []
             publishers = []
@@ -211,7 +221,7 @@ class clientApp(App):
             self.score = str(response['game_score'])
 
             self.description = response['description']
-        self.sm.go_to_game_page()
+        self.rw.sm.go_to_game_page()
 
 
 client = clientApp()

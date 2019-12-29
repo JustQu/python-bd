@@ -1,9 +1,18 @@
 #:kivy 1.10.0
 
+<RootWidget>:
+	orientation: 'vertical'
+	sm: screen_manager
+	MenuBar:
+		a: app
+		size_hint_y: .1
+	MyScreenManager:
+		id: screen_manager
+
 <MyScreenManager>:
 	name: 'screen_manager2'
-	id: 'screen_manager'
-	RootWidget:
+	#id: screen_manager
+	MainPage:
 	GamePage:
 		Button:
 			text: 'back'
@@ -146,6 +155,7 @@
 		text: root.game_year
 		on_touch_down: pass
 
+
 <RV>:
 	pepega: pepega
 	id: rv
@@ -161,7 +171,7 @@
 		multiselect: False
         touch_multiselect: False
 
-<RootWidget>:
+<MainPage>:
 	name: 'main_page'
 	orientation: 'vertical'
 	canvas.before:
@@ -170,18 +180,17 @@
 		Rectangle:
 			pos: self.pos
 			size: self.size
-	MenuBar:
-		size_hint_y: .1
 	SearchEngine:
 		size: self.size
 		size_hint: 1, .1
 	AdminPanel:
-		size_hint_y: None
-		height: 0 if not app.admin else 40
+		size_hint_y: None if not app.admin else .1
+		height: 0
 		opacity: 0 if not app.admin else 1
 		Button:
 			#pos_hint: {'x': 2, 'y': 2} if not app.admin else {'x': 0.88, 'y': 0}
 			size_hint_x: None
+			size_hint_y: 1
 			text: 'add game'
 			on_press: root.parent.go_to_new_game_page()
 	RV:
@@ -189,8 +198,9 @@
 <AdminPanel>:
 	canvas.before:
 		Color:
-			rgba: .6, .2, .3, 1
+			rgba: .6, .2, .9, 1
 		Rectangle:
+			size: self.size
 
 
 <SearchEngine>:

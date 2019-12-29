@@ -8,6 +8,7 @@ from sock_communication import get_response
 Builder.load_file('MenuBar.kv')
 
 class MenuBar(BoxLayout):
+    a = ObjectProperty(None)
     admin = BooleanProperty(False)
 
     loged_in = BooleanProperty(False)
@@ -26,21 +27,19 @@ class MenuBar(BoxLayout):
 
         if response != {}:
             if response['status'] == 'success':
-               # client.loged_in = True
+                self.a.loged_in = True
                 self.loged_in = True
-              #  client.user_login = login
                 self.user_login = login
-
 
                 self.login_field.hide()
                 self.user_field.show()
                 #self.size_hint_y = None
                 #self.height = 0
                 if response['group'] == 'admin':
-                   # client.admin = True
+                   self.a.admin = True
                    self.admin = True
                 else:
-                    #client.admin = False
+                    self.a.admin = False
                     self.admin = False
 
     

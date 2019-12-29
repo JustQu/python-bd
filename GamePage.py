@@ -8,9 +8,6 @@ print('here')
 
 Builder.load_file('gamepage.kv')
 
-class AdminPanel(RelativeLayout):
-    pass
-
 class GamePage(Screen):
     pass
 

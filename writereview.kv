@@ -1,0 +1,28 @@
+#:kivy 1.10.0
+
+<ControlButtons@BoxLayout>:
+	Button:
+		text: 'назад'
+
+<WriteReview@BoxLayout>:
+	orientation: 'vertical'
+	Label:
+		text: 'Отзыв: '
+	TextInput:
+	BoxLayout:
+		orientation: 'horizontal'
+		Label:
+			text: 'Оценка: '
+		Slider:
+			id: score
+			min: 0
+			max: 10
+			step: 1
+		Label:
+			text: str(int(score.value)) + ' / 10'
+	Button:
+		text: 'Оставить отзыв'
+		
+
+<WriteReviewPage>:
+	WriteReview:

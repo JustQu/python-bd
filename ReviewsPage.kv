@@ -1,0 +1,64 @@
+#:kivy 1.10.0
+
+<ViewReview>:
+	orientation: 'vertical'
+	login: ''
+	review_text: ''
+	#size_hint: 1, None
+	login_label: login
+	text_label: text
+	canvas.after:
+		Color:
+			rgba: 0.5, 0.3, 0.3, 1
+		Line:
+			width: 1.5
+			rectangle: self.x, self.y, self.width, self.height
+	Label:
+		canvas.before:
+			Color:
+				rgba: 0.1, 0.1, 0.1, 1
+			Rectangle:
+				size: self.size
+				pos: self.pos
+			# Line:
+				# width: 1
+				# rectangle: self.x, self.y, self.width, self.height
+		id: login
+		halign: 'right'
+		valign: 'top'
+		pos_hint: {'right': 1}
+		size_hint_x: None
+		#text_size: self.size
+		size: self.texture_size
+		size_hint_y: None
+		# padding_x: 10
+		# padding_y: 1
+		font_size: 20
+		text: root.login
+	Label:
+		id: text
+		font_size: 20
+		size: self.texture_size
+		halign: 'left'
+		valign: 'center'
+		text: root.review_text
+		text_size: self.size[0], None
+
+
+<RV>:
+	viewclass: 'ViewReview'
+	RecycleBoxLayout:
+		id: pepega
+		default_size: None, None
+		default_size_hint: 1, None
+		size_hint_y: None
+		height: self.minimum_height
+		orientation: 'vertical'
+		spacing: 10
+		multiselect: False
+        touch_multiselect: False
+
+
+<ReviewsPage>:
+	name: 'reviews_page'
+	RV:
