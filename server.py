@@ -194,6 +194,12 @@ def add_game(**kwargs):
     
     for genre in kwargs['genres']:
         cursor.execute('''
+            INSERT IGNORE INTO `genres`(`genre_name`)
+                SELECT
+                '%(genre)s';
+        ''' % {'genre': genre})
+    
+        cursor.execute('''
             INSERT INTO `game_genre`(`game_id`, `genre_id`)
             SELECT `game_id`, `genre_id` FROM `games`, `genres`
             WHERE `game_name` = '%(name)s'
